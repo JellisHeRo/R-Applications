@@ -1,0 +1,263 @@
+---
+title: "Mapping Employment in 4 Metropolitans"
+author: "Joshua Ellis"
+output: 
+  flexdashboard::flex_dashboard:
+    #storyboard: true
+    theme: bootstrap
+---
+
+```{r setup, include=FALSE}
+pacman::p_load(dplyr,leaflet,flexdashboard,maptools,spdep)
+load("F:/UDM Project/May15.RData")
+```
+
+ 
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+<h4> About </h4>
+
+This application is an adapts on one of my class projects. The maps provide the employment-to-population ratio (EPR) in 4 different metropolitan areas for three different time periods: 2000, 2010, and 2014. In these maps, we see how the EPR values cluster and disperse over time. 
+
+**Source**: 
+
+- US Census American Community Survey for years 2000, 2010, and 2014.
+- US Cenus TIGER Line Shapefiles.
+
+
+
+Column {data-width=325}
+-----------------------------------------------------------------------
+### Riverside Metro
+```{r}
+pal <- colorQuantile("YlGn", NULL, n = 5)
+
+county_popup <- paste0("<strong>Tract: </strong>", 
+                       paste0(rs_msa10$GEO_ID),  
+                       "<br><strong>POP: </strong>", 
+                       round(rs_msa10$POP, 3),
+                       "<br><strong>EPR: </strong>", 
+                       round(rs_msa10$EPR, 3))  
+county_popup2 <- paste0("<strong>Tract: </strong>", 
+                       paste0(rs_msa14$AFFGEOID),  
+                       "<br><strong>POP: </strong>", 
+                       round(rs_msa14$POP, 3),
+                       "<br><strong>EPR: </strong>", 
+                       round(rs_msa14$EPR, 3))  
+county_popup00 <- paste0("<strong>Tract: </strong>", 
+                       paste0(rs_msa00$GEOID),  
+                       "<br><strong>POP: </strong>", 
+                       round(rs_msa00$POP, 3),
+                       "<br><strong>EPR: </strong>", 
+                       round(rs_msa00$EPR, 3))
+
+leaflet() %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(data = rs_msa00,
+              fillColor = ~pal(EPR), 
+              fillOpacity = 0.8, 
+              color = "#BDBDC3", 
+              weight = 1, 
+              popup = county_popup00,
+              group="2000") %>% 
+  addPolygons(data = rs_msa10,
+              fillColor = ~pal(EPR), 
+              fillOpacity = 0.8, 
+              color = "#BDBDC3", 
+              weight = 1, 
+              popup = county_popup,
+              group="2010") %>%     
+  addPolygons(data = rs_msa14,
+              fillColor = ~pal(EPR), 
+              fillOpacity = 0.8, 
+              color = "#BDBDC3", 
+              weight = 1, 
+              popup = county_popup2,
+              group="2014") %>% 
+  addLegend(position = 'bottomright', pal = pal, 
+            values = rs_msa10$EPR, title = 'EPR') %>% 
+  addLayersControl(
+    baseGroups = c("2000","2010","2014"), 
+    options = layersControlOptions(collapsed = FALSE))
+
+```
+
+
+### New York Metro
+```{r}
+{ # NEW YORK
+  pal <- colorQuantile("YlGn", NULL, n = 5)
+  
+  county_popup <- paste0("<strong>Tract: </strong>", 
+                         paste0(nyc_msa10$GEO_ID),  
+                         "<br><strong>POP: </strong>", 
+                         round(nyc_msa10$POP, 3),
+                         "<br><strong>EPR: </strong>", 
+                         round(nyc_msa10$EPR, 3))  
+  county_popup2 <- paste0("<strong>Tract: </strong>", 
+                          paste0(nyc_msa14$AFFGEOID),  
+                          "<br><strong>POP: </strong>", 
+                          round(nyc_msa14$POP, 3),
+                          "<br><strong>EPR: </strong>", 
+                          round(nyc_msa14$EPR, 3))  
+  county_popup00 <- paste0("<strong>Tract: </strong>", 
+                           paste0(nyc_msa00$GEOID),  
+                           "<br><strong>POP: </strong>", 
+                           round(nyc_msa00$POP, 3),
+                           "<br><strong>EPR: </strong>", 
+                           round(nyc_msa00$EPR, 3))
+  
+  leaflet() %>%
+    addProviderTiles("CartoDB.Positron") %>%
+    addPolygons(data = nyc_msa00,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup00,
+                group="2000") %>% 
+    addPolygons(data = nyc_msa10,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup,
+                group="2010") %>%     
+    addPolygons(data = nyc_msa14,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup2,
+                group="2014") %>% 
+    addLegend(position = 'bottomright', pal = pal, 
+              values = nyc_msa10$EPR, title = 'EPR') %>% 
+    addLayersControl(
+      baseGroups = c("2000","2010","2014"), 
+      options = layersControlOptions(collapsed = FALSE))
+}
+```
+
+
+Column {data-width=325}
+-----------------------------------------------------------------------
+### Detroit Metro
+```{r}
+{ # DETROIT
+  pal <- colorQuantile("YlGn", NULL, n = 5)
+  
+  county_popup <- paste0("<strong>Tract: </strong>", 
+                         paste0(det_msa10$GEO_ID),  
+                         "<br><strong>POP: </strong>", 
+                         round(det_msa10$POP, 3),
+                         "<br><strong>EPR: </strong>", 
+                         round(det_msa10$EPR, 3))  
+  county_popup2 <- paste0("<strong>Tract: </strong>", 
+                          paste0(det_msa14$AFFGEOID),  
+                          "<br><strong>POP: </strong>", 
+                          round(nyc_msa14$POP, 3),
+                          "<br><strong>EPR: </strong>", 
+                          round(det_msa14$EPR, 3))  
+  county_popup00 <- paste0("<strong>Tract: </strong>", 
+                           paste0(det_msa00$GEOID),  
+                           "<br><strong>POP: </strong>", 
+                           round(det_msa00$POP, 3),
+                           "<br><strong>EPR: </strong>", 
+                           round(det_msa00$EPR, 3))
+  
+  leaflet() %>%
+    addProviderTiles("CartoDB.Positron") %>%
+    addPolygons(data = det_msa00,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup00,
+                group="2000") %>% 
+    addPolygons(data = det_msa10,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup,
+                group="2010") %>%     
+    addPolygons(data = det_msa14,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup2,
+                group="2014") %>% 
+    addLegend(position = 'bottomright', pal = pal, 
+              values = det_msa10$EPR, title = 'EPR') %>% 
+    addLayersControl(
+      baseGroups = c("2000","2010","2014"), 
+      options = layersControlOptions(collapsed = FALSE))
+}
+```
+
+
+
+### Houston Metro
+```{r}
+{ # HOUSTON
+  pal <- colorQuantile("YlGn", NULL, n = 5)
+  
+  county_popup <- paste0("<strong>Tract: </strong>", 
+                         paste0(hou_msa10$GEO_ID),  
+                         "<br><strong>POP: </strong>", 
+                         round(hou_msa10$POP, 3),
+                         "<br><strong>EPR: </strong>", 
+                         round(hou_msa10$EPR, 3))  
+  county_popup2 <- paste0("<strong>Tract: </strong>", 
+                          paste0(hou_msa14$AFFGEOID),  
+                          "<br><strong>POP: </strong>", 
+                          round(nyc_msa14$POP, 3),
+                          "<br><strong>EPR: </strong>", 
+                          round(hou_msa14$EPR, 3))  
+  county_popup00 <- paste0("<strong>Tract: </strong>", 
+                           paste0(hou_msa00$GEOID),  
+                           "<br><strong>POP: </strong>", 
+                           round(hou_msa00$POP, 3),
+                           "<br><strong>EPR: </strong>", 
+                           round(hou_msa00$EPR, 3))
+  
+  leaflet() %>%
+    addProviderTiles("CartoDB.Positron") %>%
+    addPolygons(data = hou_msa00,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup00,
+                group="2000") %>% 
+    addPolygons(data = hou_msa10,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup,
+                group="2010") %>%     
+    addPolygons(data = hou_msa14,
+                fillColor = ~pal(EPR), 
+                fillOpacity = 0.8, 
+                color = "#BDBDC3", 
+                weight = 1, 
+                popup = county_popup2,
+                group="2014") %>% 
+    addLegend(position = 'bottomright', pal = pal, 
+              values = hou_msa10$EPR, title = 'EPR') %>% 
+    addLayersControl(
+      baseGroups = c("2000","2010","2014"), 
+      options = layersControlOptions(collapsed = FALSE))
+}
+```
+
+
+
+<style>
+.navbar-brand {
+    font-size: 25px;
+}
+</style>
